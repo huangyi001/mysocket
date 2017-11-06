@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<configuration>
+
+	<property name="context_name" value="CREDIT_WEB" />
+
+	<conversionRule conversionWord="lineno" converterClass="com.uptop.websocket.logback.LineNoConverter" />
+	<conversionRule conversionWord="tracelogid" converterClass="com.uptop.websocket.logback.TraceLogIdConverter" />
+
+	<appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder charset="utf-8">
+			<!-- encoder 可以指定字符集，对于中文输出有意义 -->
+			<!-- %.-1level 只显示信息级别的首字母,%-5level 左对齐显示信息级别全称 -->
+			<!-- 如需自定义关键字，用 %mdc{键名} 表示,程序中用MDC.put("键名","键值")设置，可动态设置 [%logger:%line]-->
+			<!--<Pattern>[%date] [%thread] [%-5level] &#45;&#45;%mdc{client} [%X{TRACE_LOG_ID}] %logger %line %msg%n</Pattern>-->
+			<pattern>[%date{yyyy-MM-dd HH:mm:ss.SSS}] [%level] [%lineno] [%thread] traceLogid:[%tracelogid] dstTraceId:[%X{dstID}] call[%logger{0}][%method] %msg%n</pattern>
+		</encoder>>
+	</appender>
+
+	<appender name="credit_log" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>logs/javawebsocket.log</file>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>logs/javawebsocket.%d{yyyy-MM-dd}.log</fileNamePattern>
+			<maxHistory>90</maxHistory>
+		</rollingPolicy>
+		<encoder>
+			<!--<pattern>%d{HH:mm:ss.SSS} [%tracelogid] %-5level [%lineno] - %msg%n</pattern>-->
+			<pattern>[%date{yyyy-MM-dd HH:mm:ss.SSS}] [%level] [%lineno] [%thread] traceLogid:[%tracelogid] dstTraceId:[%X{dstID}] call[%logger{0}][%method] %msg%n</pattern>
+			<immediateFlush>true</immediateFlush>
+			<charset class="java.nio.charset.Charset">UTF-8</charset>
+		</encoder>
+	</appender>
+
+	<logger name="com.uptop.websocket" level="INFO" additivity="false">
+		<appender-ref ref="credit_log" />
+		<appender-ref ref="stdout" />
+	</logger>
+
+	<root level="INFO">
+		<appender-ref ref="credit_log" />
+	</root>
+
+	<!--jar-->
+	<logger name="org.springframework.amqp" level="INFO" />
+
+</configuration>
